@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Holomorphic Maps</title>
+	<link rel="stylesheet" href="./w3-copy.css">
+	<link rel="stylesheet" href="./style.css">
+    <style>
+        .sliderGreen::-webkit-slider-thumb {
+            background: #00FF00;
+        }
+        .sliderBlue::-webkit-slider-thumb {
+            background: #0000FF;
+        }
+        .sliderRed::-webkit-slider-thumb {
+            background: #FF0000;
+        }
+    </style>
+  </head>
+  <body>
+<div style="width: 100%; min-width: 350px;">
+
+
+
+	<header class="clear-overflow">
+		<nav>
+			<button id="newPlot">New Plot</button>
+			<button id="mapButton">Map</button>
+			<button id="savePngButton">Save As PNG</button>
+			<button id="closePlots">Close Plots</button>
+		</nav>
+	</header>
+	<section id="modeButtonsContainer" class="w3-bar clear-overflow">
+        <div class="canvas-container">
+            <canvas id="lineButton" width="40" height="40"></canvas>
+        </div>
+        <div class="canvas-container">
+            <canvas id="ellipseButton" width="40" height="40"></canvas>
+        </div>
+       <div class="canvas-container">
+            <canvas id="circleButton" width="40" height="40"></canvas>
+        </div>
+        <div class="canvas-container">
+            <canvas id="rectangleFilledButton" width="40" height="40"></canvas>
+        </div>
+        <div class="canvas-container">
+            <canvas id="ellipseFilledButton" width="40" height="40"></canvas>
+        </div>
+        <div class="canvas-container">
+            <canvas id="circleFilledButton" width="40" height="40"></canvas>
+        </div>
+        <div class="canvas-container">
+            <canvas id="polygonButton" width="40" height="40"></canvas>
+        </div>
+    </section>
+    <section id="colorSelector" style="display: flex; flex-direction: row; width: 100%">
+        <canvas width="50" height="50" id="selectedColor"></canvas>
+        <div id="slidersContainer" style="width: 100%; display: flex; flex-direction: column">
+            <input type="range" class="slider sliderRed" min="0" max="255" value="0" id="redSlider">
+            <input type="range" class="slider sliderGreen" min="0" max="255" value="0" id="greenSlider">
+            <input type="range" class="slider sliderBlue" min="0" max="255" value="0" id="blueSlider">
+        </div>
+    </section>
+   
+   <section id="functionsSectionContainer">
+
+    <h1>Choose function:</h1>
+    <div id="functionsContainer" style="overflow: auto; display: flex; flex-direction: column; margin: 5px;
+                                        height: 200px; border: 1px solid black;">
+    </div>
+	
+	</section>
+	
+</div>
+	
+	
+	<!-- <br><br><br><br><br><br><br><br><br><br><br> -->
+	
+	<!-- Tool Tip 
+	<aside id="tooltipbox" class="w3-card-4 w3-border w3-border-black w3-light-gray w3-round" style="display:inline-block;padding:5px">
+<p style="text-align:center">Je suis un cool type !<br>Mais faut pas m'tester</p>
+	</aside><!---->
+
+    <script type="text/javascript">
+        require("../js/mainwindow-fastopt.js")
+    </script>
+  </body>
+</html>
