@@ -56,6 +56,12 @@ class Plot private {
     if (isFocusedPlot) {
       Plot._focusedPlot = None
     }
+
+    Plot._plots.find(_._2 == this) match {
+      case Some((id, _)) =>
+        Plot._plots.remove(id)
+      case None =>
+    }
   })
 
   def id: Int = window.id

@@ -11,7 +11,6 @@ import io.IO
 import mathobjects._
 import nodejs.{Buffer, Path}
 import org.scalajs.dom
-import org.scalajs.dom.html
 import org.scalajs.dom.raw.Event
 import plotcommunication.mathobjectmessages._
 import renderer.PlotWindow
@@ -20,7 +19,6 @@ import scala.collection.mutable
 import scala.scalajs.js
 import scala.scalajs.js.typedarray.TypedArrayBufferOps._
 import scala.scalajs.js.JSConverters._
-import scala.util.matching.Regex
 
 abstract class Message
 
