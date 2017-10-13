@@ -5,7 +5,7 @@ import java.nio.ByteBuffer
 import actions.MathObjectAction
 import boopickle.CompositePickler
 import boopickle.Default._
-import custommath.HolomorphicMap
+import custommath.{Complex, HolomorphicMap}
 import electron.{BrowserWindow, IPCRenderer, NativeImage}
 import io.IO
 import mathobjects._
@@ -51,9 +51,9 @@ object Message {
   private var functionToApply: Option[HolomorphicMap] = None
 
 
-  private val receivedObjects: mutable.Map[Long, MathObject] = mutable.Map()
+  private val receivedObjects: mutable.Map[Int, MathObject] = mutable.Map()
 
-  private val receivedFunctions: mutable.Queue[(Long, MathObject)] = mutable.Queue()
+  private val receivedFunctions: mutable.Queue[(Int, MathObject)] = mutable.Queue()
   private def flush(): Unit = if (functionToApply.isDefined) {
     while (receivedFunctions.nonEmpty) {
       val (id, receivedObject) = receivedFunctions.dequeue()
@@ -105,12 +105,27 @@ object Message {
 
     Message.decode(buffer.asInstanceOf[scala.scalajs.js.Array[Byte]]) match {
       case msg: MathObjectMessage =>
-        receivedFunctions.enqueue((msg.id, MathObject.fromMessage(msg)))
+        receivedFunctions.enqueue((msg.id.toInt, MathObject.fromMessage(msg)))
         flush()
       case _ =>
     }
 
   })
+
+  IPCRenderer.on(
+    "plot-communication-message-raw-shape",
+    (_: Event, id: Int, triangleVertices: js.Array[Double], rgbArray: js.Array[Int]) => {
+      val rgb = (rgbArray(0), rgbArray(1), rgbArray(2))
+
+      val triangles = triangleVertices.grouped(6).map(array => {
+        val vertices = array.grouped(2).map(couple => Complex(couple(0), couple(1))).toArray
+        Triangle(vertices(0), vertices(1), vertices(2))
+      })
+
+      receivedFunctions.enqueue((id, new RawShape(triangles.toList, rgb)))
+      flush()
+    }
+  )
 
   IPCRenderer.on("map", (_: Event, windowId: Int, functionName: String) => {
 
@@ -133,15 +148,22 @@ object Message {
 
   private def sendShape(id: Long, shape: Shape, windowId: Int): Unit = {
 
-    val (sendNow, sendLater) = shape.triangles.splitAt(10000)
+    val (sendNow, sendLater) = shape.triangles.splitAt(5000)
+
+//    BrowserWindow.fromId(windowId).webContents.send(
+//      "plot-communication-message",
+//      encode(RawShapeMessage(id, sendNow.map({ case Triangle(v1, v2, v3) => TriangleMessage(v1, v2, v3)}), shape.rgb))
+//    )
 
     BrowserWindow.fromId(windowId).webContents.send(
-      "plot-communication-message",
-      encode(RawShapeMessage(id, sendNow.map({ case Triangle(v1, v2, v3) => TriangleMessage(v1, v2, v3)}), shape.rgb))
+      "plot-communication-message-raw-shape",
+      id.toInt, sendNow.flatMap({ case Triangle(Complex(x1, y1), Complex(x2, y2), Complex(x3, y3)) => js.Array[Double](
+        x1, y1, x2, y2, x3, y3
+      )}).toJSArray, js.Array[Int](shape.rgb._1, shape.rgb._2, shape.rgb._3)
     )
 
     if (sendLater.nonEmpty) {
-      js.timers.setTimeout(100) {
+      js.timers.setTimeout(50) {
         sendShape(id, new RawShape(sendLater, shape.rgb), windowId)
       }
     }
